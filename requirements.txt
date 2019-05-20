@@ -1,0 +1,4 @@
+artifacts==20190320
+pyyaml==5.1
+pytsk3==20190507
+PyInstaller==3.4
