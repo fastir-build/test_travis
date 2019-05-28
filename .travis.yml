@@ -1,29 +1,37 @@
 language: python
-python: "3.7"
+python: '3.7'
 matrix:
   include:
-    - os: osx
-      language: sh
-      python: "3.7"
-      # Perform the manual steps on osx to install python3 and activate venv
-      before_install:
-        - brew update
-        - brew upgrade python3
-        - python3 -m pip install virtualenv
-        - virtualenv .venv -p python3
-        - source .venv/bin/activate
-    - os: windows
-      language: sh
-      python: "3.7"
-      before_install:
-        - choco install python3
-        - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
-        - python -m pip install --upgrade pip wheel
-        - pip install -U -r requirements-windows.txt
-install: 
-  # Get newer pip and whell for binary caching support
-  - pip install --upgrade pip wheel
-  - pip install -U -r requirements.txt
-script: 
-  - pyinstaller main.spec
-
+  - os: osx
+    language: sh
+    python: '3.7'
+    before_install:
+    - python3 -m pip install virtualenv
+    - virtualenv .venv -p python3
+    - source .venv/bin/activate
+    after_script:
+    - dist/fastir_artifacts/fastir_artifacts
+  - os: windows
+    language: sh
+    python: '3.7'
+    before_install:
+    - choco install python3
+    - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+    - python -m pip install --upgrade pip wheel
+    - pip install -U -r requirements-windows.txt
+    after_script:
+    - dist/fastir_artifacts/fastir_artifacts.exe
+install:
+- pip install --upgrade pip wheel
+- pip install -U -r requirements.txt
+script:
+- pyinstaller main.spec
+after_sucess:
+- 7zr a FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist/fastir_artifacts
+deploy:
+  provider: releases
+  api_key:
+    secure: gsWwZgehCEQiH30TYY4PcIR4biXoljJvJ6cWwAbDF3urqrUhR4bEqk/pUebt9EiQqAuN9irsjVKydll2SQKX5kKXFjr9/xVuwHPP1Im+zkRo6CGwMUzzVEy46HXRY2MZ7KmL9rfhwEhFddlm6mU1kdkNumpzwDdktKBSlxRPZuKZFhTczL63z47uhKFqmXSl9Vb2IHDT+TWs4yxRFB7p7jGqdy8fsRXvDGNH/9CVyZoF7+BRDbEGEx1atTHvdEAiXHq32G6Nlc5CQkIVFX7r1PrBccrlo3c7b/q6cUeAvLWfpF8P3AqzQamjX1pxCP70MzHs2cflto1FgRjGrWAGA28lrI67lFthquUxpvpVcPdmmU9K3Cx8uL+fNRJSGwUhOJpy7sa6WUZHZV84fh3zEzaPyzP0HMz4JVoYeJ4S+K0Kw3YmZ/r91Wry0herdJEbLCc9CToM32bY+oc3hxrBZrcAiMlPJrKyZs6IDyEu0FkkGuyf1dQl0wmiLd6DIN+RsxJCcroGbsrAskOvtnK/z8bpdevBaFumXZlampfw8CfIWmCikY9WoeTdOC0fnawctjOm4uZ0IAu0Z+61QyayFJicQMbG8g/pKjbp6FzQqKtBrYqwGydMjs1jnVgMiiIvFu+ItKAGbelubCTP2xolN4T9kHrm72//0Go7GUlo73w=
+  file: FastIR-Artifacts-${TRAVIS_OS_NAME}.zip
+  on:
+    repo: fastir-build/test_travis
