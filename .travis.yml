@@ -16,7 +16,7 @@ matrix:
     before_install:
     - choco install python3
     - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
-    - python3 -m venv .venv
+    - python -m venv .venv
     - .venv/Scripts/activate.bat
     before_script: pip3 install -U -r requirements-windows.txt
 install:
@@ -25,7 +25,7 @@ install:
 script:
 - pyinstaller main.spec
 after_success:
-- 7zr a FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist
+- python3 -m zipfile --create FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist
 deploy:
   provider: releases
   api_key:
