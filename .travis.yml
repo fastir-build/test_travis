@@ -16,16 +16,15 @@ matrix:
     before_install:
     - choco install python3
     - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
-    - python -m venv .venv
-    - .venv/Scripts/activate.bat
-    before_script: pip3 install -U -r requirements-windows.txt
+    - python -m pip install --upgrade pip wheel
+    - pip install -U -r requirements-windows.txt
 install:
-- pip3 install -U pip wheel
-- pip3 install -U -r requirements.txt
+- pip install -U pip wheel
+- pip install -U -r requirements.txt
 script:
 - pyinstaller main.spec
 after_success:
-- python3 -m zipfile --create FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist
+- python -m zipfile -c FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist
 deploy:
   provider: releases
   api_key:
