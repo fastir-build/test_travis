@@ -35,4 +35,3 @@ deploy:
   overwrite: true
   on:
     repo: fastir-build/test_travis
-    all_branches: true
