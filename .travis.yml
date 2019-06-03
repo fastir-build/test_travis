@@ -4,24 +4,27 @@ matrix:
   - name: "Python 3.7 on Xenial Linux"
     python: 3.7
     dist: xenial
-  - name: "Python 3.7 on macOS"
+  - name: "Python 3 on macOS"
     os: osx
     language: shell
     before_install:
     - python3 -m venv .venv
     - source .venv/bin/activate
-  - name: "Python 3.7 on Windows"
+  - name: "Python 3 on Windows"
     os: windows
     language: shell
-    before_install: choco install python
-    env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+    before_install:
+    - choco install python3
+    - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+    - python3 -m venv .venv
+    - .venv/Scripts/activate.bat
     before_script: pip3 install -U -r requirements-windows.txt
 install:
-- pip3 install -U pip
+- pip3 install -U pip wheel
 - pip3 install -U -r requirements.txt
 script:
 - pyinstaller main.spec
-after_sucess:
+after_success:
 - 7zr a FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist
 deploy:
   provider: releases
