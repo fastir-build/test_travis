@@ -12,10 +12,10 @@ matrix:
     language: shell
     before_install: choco install python
     env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
-    before_script: pip3 install -U -r requirements-windows.txt
+    before_script: pip3 install --user -U -r requirements-windows.txt
 install:
-- pip3 install --upgrade pip
-- pip3 install -U -r requirements.txt
+- pip3 install --user -U pip
+- pip3 install --user -U -r requirements.txt
 script:
 - pyinstaller main.spec
 after_sucess:
@@ -30,3 +30,4 @@ deploy:
   overwrite: true
   on:
     repo: fastir-build/test_travis
+    all_branches: true
