@@ -5,10 +5,10 @@ import sys
 def Main():
     if sys.platform == 'linux':
         command = os.path.join('dist', 'fastir_artifacts', 'fastir_artifacts')
-        command =  ' '.join(['sudo', command])
+        command = ['sudo', command]
     elif sys.platform == 'darwin':
         command = os.path.join('dist', 'fastir_artifacts', 'fastir_artifacts')
-        command =  ' '.join(['sudo', command])
+        command = ['sudo', command]
     elif sys.platform == 'win32':
         command = os.path.join('dist', 'fastir_artifacts', 'fastir_artifacts.exe')
     else:
