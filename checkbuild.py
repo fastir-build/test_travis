@@ -4,11 +4,11 @@ import sys
 
 def Main():
     if sys.platform == 'linux':
-        command = os.path.join('dist', 'main', 'main')
+        command = os.path.join('dist', 'fastir_artifacts', 'fastir_artifacts')
     elif sys.platform == 'darwin':
-        command = os.path.join('dist', 'main', 'main')
+        command = os.path.join('dist', 'fastir_artifacts', 'fastir_artifacts')
     elif sys.platform == 'win32':
-        command = os.path.join('dist', 'main', 'main.exe')
+        command = os.path.join('dist', 'fastir_artifacts', 'fastir_artifacts.exe')
     else:
         return False
 

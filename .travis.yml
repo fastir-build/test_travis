@@ -22,9 +22,9 @@ install:
 - pip install -U pip wheel
 - pip install -U -r requirements.txt
 script:
-- pyinstaller main.spec
+- pyinstaller fastir_artifacts.spec
 after_success:
-- python -m zipfile -c FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist/main
+- python -m zipfile -c FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist/fastir_artifacts
 - python checkbuild.py
 before_deploy:
 - git config --local user.name "fastir-build"
