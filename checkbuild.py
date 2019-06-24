@@ -12,7 +12,12 @@ def Main():
     else:
         return False
 
-    print(subprocess.check_output(command, stderr=subprocess.STDOUT))
+    try:
+        command_output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        command_output = e.output
+
+    print(command_output)
 
     return True
 
