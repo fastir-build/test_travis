@@ -1,9 +1,19 @@
 import os
+import subprocess
 import sys
 
 def Main():
-    print(sys.platform)
-    print(os.listdir(os.path.join('dist','main')))
+    if sys.platform == 'linux':
+        command = os.path.join('dist', 'main', 'main')
+    elif sys.platform == 'darwin':
+        command = os.path.join('dist', 'main', 'main')
+    elif sys.platform == 'win32':
+        command = os.path.join('dist', 'main', 'main.exe')
+    else:
+        return False
+
+    print(subprocess.check_output(command, stderr=subprocess.STDOUT))
+
     return True
 
 if __name__ == '__main__':
