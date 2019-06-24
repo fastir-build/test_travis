@@ -1,6 +1,7 @@
 import sys
 
 def Main():
+    print(sys.platform)
     return True
 
 if __name__ == '__main__':
