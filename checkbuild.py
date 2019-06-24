@@ -19,7 +19,7 @@ def Main():
     except subprocess.CalledProcessError as e:
         command_output = e.output
 
-    print(command_output)
+    print(str(command_output, 'utf-8'))
 
     return True
 
