@@ -25,9 +25,9 @@ def Main():
 
     output_directory = list(filter(lambda x: x.startswith('20'), os.listdir('.')))[0]
 
-#    if sys.platform == 'darwin' or sys.platform == 'linux':
-#        command = ['sudo', 'chown', '-R', f'{os.getuid()}:{os.getgid()}', output_directory]
-#        subprocess.check_output(command, stderr=subprocess.STDOUT)
+    if sys.platform == 'darwin' or sys.platform == 'linux':
+        command = ['sudo', 'chown', '-R', f'{os.getuid()}:{os.getgid()}', output_directory]
+        subprocess.check_output(command, stderr=subprocess.STDOUT)
 
     print(os.listdir(output_directory))
 
