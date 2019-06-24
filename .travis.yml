@@ -30,7 +30,7 @@ before_deploy:
 - git config --local user.name "fastir-build"
 - git config --local user.email "50839404+fastir-build@users.noreply.github.com"
 - export TRAVIS_TAG=${TRAVIS_TAG:-$(git log --date=format:%Y%m%d%H%M%S --format=%cd-%h -1)}
-- git tag $TRAVIS_TAG
+- git tag $TRAVIS_TAG || true
 deploy:
   provider: releases
   api_key:
