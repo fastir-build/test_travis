@@ -86,25 +86,25 @@ def Main():
         nl = z.namelist()
         if '/etc/passwd' in nl and '/proc/mounts' in nl:
             with z.open('/etc/passwd') as f:
-                if 'root' not in f.read():
+                if b'root' not in f.read():
                     print('Wrong /etc/passwd file')
                     return False
             with z.open('/proc/mounts') as f:
-                if ' / ' not in f.read():
+                if b' / ' not in f.read():
                     print('Wrong /proc/mounts file')
                     return False
         elif '/private/etc/passwd' in nl:
             with z.open('/private/etc/passwd') as f:
-                if 'root' not in f.read():
+                if b'root' not in f.read():
                     print('Wrong /private/etc/passwd file')
                     return False
         elif 'C/$MFT' in nl and 'C/Windows/System32/drivers/etc/hosts' in nl:
             with z.open('C/$MFT') as f:
-                if 'FILE0' not in f.read():
+                if b'FILE0' not in f.read():
                     print('Wrong C/$MFT')
                     return False
             with z.open('C/Windows/System32/drivers/etc/hosts') as f:
-                if 'This is a sample HOSTS file used by Microsoft TCP/IP for Windows.' not in f.read():
+                if b'This is a sample HOSTS file used by Microsoft TCP/IP for Windows.' not in f.read():
                     print('Wrong C/Windows/System32/drivers/etc/hosts')
                     return False
         else:
