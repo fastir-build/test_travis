@@ -23,9 +23,9 @@ install:
 - pip install -U -r requirements.txt
 script:
 - pyinstaller fastir_artifacts.spec
+- python checkbuild.py
 after_success:
 - python -m zipfile -c FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist/fastir_artifacts
-- python checkbuild.py
 before_deploy:
 - git config --local user.name "fastir-build"
 - git config --local user.email "50839404+fastir-build@users.noreply.github.com"
