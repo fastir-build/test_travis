@@ -36,6 +36,7 @@ def Main():
         command = ['sudo', 'chown', '-R', f'{os.getuid()}:{os.getgid()}', output_directory]
         subprocess.check_output(command)
 
+    # Check COMMAND artifacts
     commands_output = list(filter(lambda x: x.endswith('-commands.json'), os.listdir(output_directory)))
     if len(commands_output) != 1:
         print('commands.json not found')
@@ -75,15 +76,43 @@ def Main():
             print(json.dumps(commands))
             return False
 
+    # Check FILE artifacts
     files_output = list(filter(lambda x: x.endswith('-files.zip'), os.listdir(output_directory)))
     if len(files_output) != 1:
         print('files.zip not found')
         return False
     files_output = os.path.join(output_directory, files_output[0])
-    with zipfile.ZipFile(files_output) as f:
-        for zi in f.infolist():
-            print(f'{zi.filename} {zi.file_size}')
+    with zipfile.ZipFile(files_output) as z:
+        nl = z.namelist()
+        if '/etc/passwd' in nl and '/proc/mounts' in nl:
+            with z.open('/etc/passwd') as f:
+                if 'root' not in f.read():
+                    print('Wrong /etc/passwd file')
+                    return False
+            with z.open('/proc/mounts') as f:
+                if ' / ' not in f.read():
+                    print('Wrong /proc/mounts file')
+                    return False
+        elif '/private/etc/passwd' in nl:
+            with z.open('/private/etc/passwd') as f:
+                if 'root' not in f.read():
+                    print('Wrong /private/etc/passwd file')
+                    return False
+        elif 'C/$MFT' in nl and 'C/Windows/System32/drivers/etc/hosts' in nl:
+            with z.open('C/$MFT') as f:
+                if 'FILE0' not in f.read():
+                    print('Wrong C/$MFT')
+                    return False
+            with z.open('C/Windows/System32/drivers/etc/hosts') as f:
+                if 'This is a sample HOSTS file used by Microsoft TCP/IP for Windows.' not in f.read():
+                    print('Wrong C/Windows/System32/drivers/etc/hosts')
+                    return False
+        else:
+            print('Usual files not found')
+            print(nl)
+            return False
 
+    # Check logs file
     logs_output = list(filter(lambda x: x.endswith('-logs.txt'), os.listdir(output_directory)))
     if len(logs_output) != 1:
         print('logs.txt not found')
@@ -93,6 +122,7 @@ def Main():
         for l in f.readlines():
             print(l.strip())
 
+    # Check WMI artifacts
     if sys.platform == 'win32':
         wmi_output = list(filter(lambda x: x.endswith('-wmi.json'), os.listdir(output_directory)))
         if len(wmi_output) != 1:
