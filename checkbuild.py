@@ -43,7 +43,37 @@ def Main():
     commands_output = os.path.join(output_directory, commands_output[0])
     with open(commands_output, 'r') as f:
         commands = json.load(f)
-        print(json.dumps(commands))
+        if 'IPTablesRules' in commands:
+            if not commands['IPTablesRules']:
+                print('Empty IPTablesRules')
+                return False
+            for command, output in commands['IPTablesRules']:
+                if 'iptables' not in command or 'Chain INPUT' not in output:
+                    print('Wrong IPTablesRules content')
+                    print(json.dumps(commands['IPTablesRules']))
+                    return False
+        elif 'MacOSLoadedKexts' in commands:
+            if not commands['MacOSLoadedKexts']:
+                print('Empty MacOSLoadedKexts')
+                return False
+            for command, output in commands['MacOSLoadedKexts']:
+                if 'kextstat' not in command or 'Name' not in output:
+                    print('Wrong MacOSLoadedKexts content')
+                    print(json.dumps(commands['MacOSLoadedKexts']))
+                    return False
+        elif 'WindowsFirewallEnabledRules' in commands:
+            if not commands['WindowsFirewallEnabledRules']:
+                print('Empty WindowsFirewallEnabledRules')
+                return False
+            for command, output in commands['WindowsFirewallEnabledRules']:
+                if 'netsh.exe' not in command or 'Windows Defender Firewall Rules:' not in output:
+                    print('Wrong WindowsFirewallEnabledRules content')
+                    print(json.dumps(commands['WindowsFirewallEnabledRules']))
+                    return False
+        else:
+            print('Usual commands not found')
+            print(json.dumps(commands))
+            return False
 
     files_output = list(filter(lambda x: x.endswith('-files.zip'), os.listdir(output_directory)))
     if len(files_output) != 1:
