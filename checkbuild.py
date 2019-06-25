@@ -5,6 +5,7 @@ import sys
 import zipfile
 
 def Main():
+    # Launch fastir_artifacts
     if sys.platform == 'darwin' or sys.platform == 'linux':
         command = os.path.join('dist', 'fastir_artifacts', 'fastir_artifacts')
         command = ['sudo', command]
@@ -22,16 +23,19 @@ def Main():
     finally:
         print(str(command_output, 'utf-8'))
 
+    # Check if collection was successful
     if b'Finished collecting artifacts' not in command_output:
         print('Artifacts collection did not finish')
         return False
 
+    # Check output directory
     output_directory = list(filter(lambda x: x.startswith('20'), os.listdir('.')))
     if len(output_directory) != 1:
         print('Output directory not found')
         return False
     output_directory = output_directory[0]
 
+    # Fix output directory ownership
     if sys.platform == 'darwin' or sys.platform == 'linux':
         command = ['sudo', 'chown', '-R', f'{os.getuid()}:{os.getgid()}', output_directory]
         subprocess.check_output(command)
@@ -119,8 +123,11 @@ def Main():
         return False
     logs_output = os.path.join(output_directory, logs_output[0])
     with open(logs_output, 'r') as f:
-        for l in f.readlines():
-            print(l.strip())
+        d = f.read()
+        if 'Loading artifacts' not in d or 'Collecting artifacts from ' not in d or 'Collecting file ' not in d or 'Collecting command ' not in d or 'Finished collecting artifacts' not in d:
+            print('Wrong logs.txt')
+            print(d)
+            return False
 
     # Check WMI artifacts
     if sys.platform == 'win32':
