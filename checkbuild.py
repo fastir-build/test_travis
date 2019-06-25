@@ -47,7 +47,7 @@ def Main():
             if not commands['IPTablesRules']:
                 print('Empty IPTablesRules')
                 return False
-            for command, output in commands['IPTablesRules']:
+            for command, output in commands['IPTablesRules'].items():
                 if 'iptables' not in command or 'Chain INPUT' not in output:
                     print('Wrong IPTablesRules content')
                     print(json.dumps(commands['IPTablesRules']))
@@ -56,7 +56,7 @@ def Main():
             if not commands['MacOSLoadedKexts']:
                 print('Empty MacOSLoadedKexts')
                 return False
-            for command, output in commands['MacOSLoadedKexts']:
+            for command, output in commands['MacOSLoadedKexts'].items():
                 if 'kextstat' not in command or 'Name' not in output:
                     print('Wrong MacOSLoadedKexts content')
                     print(json.dumps(commands['MacOSLoadedKexts']))
@@ -65,7 +65,7 @@ def Main():
             if not commands['WindowsFirewallEnabledRules']:
                 print('Empty WindowsFirewallEnabledRules')
                 return False
-            for command, output in commands['WindowsFirewallEnabledRules']:
+            for command, output in commands['WindowsFirewallEnabledRules'].items():
                 if 'netsh.exe' not in command or 'Windows Defender Firewall Rules:' not in output:
                     print('Wrong WindowsFirewallEnabledRules content')
                     print(json.dumps(commands['WindowsFirewallEnabledRules']))
