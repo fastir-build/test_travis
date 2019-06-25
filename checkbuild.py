@@ -51,7 +51,7 @@ def Main():
         return False
     files_output = os.path.join(output_directory, files_output[0])
     with zipfile.ZipFile(files_output) as f:
-        for n in z.filelist:
+        for n in f.filelist:
             print(n)
 
     logs_output = list(filter(lambda x: x.endswith('-logs.txt'), os.listdir(output_directory)))
