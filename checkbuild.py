@@ -138,7 +138,25 @@ def Main():
         wmi_output = os.path.join(output_directory, wmi_output[0])
         with open(wmi_output, 'r') as f:
             wmi = json.load(f)
-            print(json.dumps(wmi))
+            if 'WMIDrivers' not in wmi:
+                print('WMIDrivers not found')
+                return False
+            if not wmi['WMIDrivers']:
+                print('Empty WMIDrivers')
+                return False
+            for query, output in wmi['WMIDrivers'].items():
+                if 'SELECT' not in query:
+                    print('Wrong WMIDrivers query')
+                    print(query)
+                    return False
+                if len(output) == 0:
+                    print('Wrong WMIDrivers output')
+                    print(output)
+                    return False
+                if 'Description' not in output[0] and 'DisplayName' not in output[0]:
+                    print('Wrong WMIDrivers output')
+                    print(output[0])
+                    return False
 
     return True
 
