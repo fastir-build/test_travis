@@ -1,6 +1,7 @@
 artifacts==20190320
 ConfigArgParse==0.14.0
-pyyaml==5.1
+pypiwin32==223 ; sys_platform == 'win32'
+PyYAML==5.1.1
 pytsk3==20190507
 PyInstaller==3.4
-psutil==5.6.2
+psutil==5.6.3
