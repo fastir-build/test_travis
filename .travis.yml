@@ -1,4 +1,6 @@
 language: python
+env:
+  - TZ=UTC
 matrix:
   include:
   - name: "Python 3.7 on Xenial Linux"
@@ -16,6 +18,7 @@ matrix:
     before_install:
     - choco install python3
     - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+    - python -m pip install --upgrade pip wheel
 install:
 - pip install -U pip wheel
 - pip install -U -r requirements.txt
@@ -27,7 +30,7 @@ after_success:
 before_deploy:
 - git config --local user.name "fastir-build"
 - git config --local user.email "50839404+fastir-build@users.noreply.github.com"
-- export TRAVIS_TAG=${TRAVIS_TAG:-$(git log --date=format:%Y%m%d%H%M%S --format=%cd-%h -1)}
+- export TRAVIS_TAG=${TRAVIS_TAG:-$(git log --date=format-local:%Y%m%d%H%M%S --format=%cd-%h -1)}
 - git tag $TRAVIS_TAG || true
 deploy:
   provider: releases
