@@ -9,6 +9,7 @@ import configargparse
 from fastir.common.output import Outputs
 from fastir.common.collector import Collector
 from fastir.common.logging import logger, PROGRESS
+from fastir.common.helpers import get_operating_system
 
 
 # Using a static blacklist to avoid automatic execution of steps
@@ -22,17 +23,6 @@ REGISTRY_TYPES = [
     artifacts.definitions.TYPE_INDICATOR_WINDOWS_REGISTRY_KEY,
     artifacts.definitions.TYPE_INDICATOR_WINDOWS_REGISTRY_VALUE
 ]
-
-
-def get_operating_system():
-    if sys.platform == 'linux':
-        return 'Linux'
-    elif sys.platform == 'darwin':
-        return 'Darwin'
-    elif sys.platform.startswith('win'):
-        return 'Windows'
-
-    raise ValueError(f"Unsupported Operating System: '{sys.platform}'")
 
 
 def get_artifacts_registry(use_library, paths):

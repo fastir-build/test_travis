@@ -22,7 +22,9 @@ matrix:
 install:
 - pip install -U pip wheel
 - pip install -U -r requirements.txt
+- pip install -U -r requirements-test.txt
 script:
+- python -m pytest tests
 - pyinstaller fastir_artifacts.spec
 - python checkbuild.py
 after_success:

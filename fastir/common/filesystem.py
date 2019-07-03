@@ -107,7 +107,7 @@ class TSKFileSystem(FileSystem):
                 int(tsk_entry.info.meta.flags) & pytsk3.TSK_FS_META_FLAG_ALLOC != 0)
 
     def is_directory(self, path_object):
-        return path_object.obj.info.meta.type == pytsk3.TSK_FS_META_TYPE_DIR
+        return path_object.obj.info.meta.type in [pytsk3.TSK_FS_META_TYPE_DIR, pytsk3.TSK_FS_META_TYPE_VIRT_DIR]
 
     def is_file(self, path_object):
         return path_object.obj.info.meta.type == pytsk3.TSK_FS_META_TYPE_REG
@@ -254,11 +254,19 @@ class FileSystemManager(AbstractCollector):
         self._mount_points = psutil.disk_partitions(True)
 
     def _get_mountpoint(self, filepath):
+        best_mountpoint = None
+        best_mountpoint_length = 0
+
         for mountpoint in self._mount_points:
             if filepath.startswith(mountpoint.mountpoint):
-                return mountpoint
+                if len(mountpoint.mountpoint) > best_mountpoint_length:
+                    best_mountpoint = mountpoint
+                    best_mountpoint_length = len(mountpoint.mountpoint)
 
-        raise IndexError(f'Could not find a mountpoint for path {filepath}')
+        if best_mountpoint is None:
+            raise IndexError(f'Could not find a mountpoint for path {filepath}')
+
+        return best_mountpoint
 
     def _get_filesystem(self, filepath):
         # Fetch the mountpoint for this particular path
@@ -267,7 +275,8 @@ class FileSystemManager(AbstractCollector):
         # Fetch or create the matching filesystem
         if mountpoint.mountpoint not in self._filesystems:
             if mountpoint.fstype in TSK_FILESYSTEMS:
-                self._filesystems[mountpoint.mountpoint] = TSKFileSystem(self, mountpoint.device, mountpoint.mountpoint)
+                self._filesystems[mountpoint.mountpoint] = TSKFileSystem(
+                    self, mountpoint.device, mountpoint.mountpoint)
             else:
                 self._filesystems[mountpoint.mountpoint] = OSFileSystem(mountpoint.mountpoint)
 
@@ -284,7 +293,7 @@ class FileSystemManager(AbstractCollector):
         if pattern.startswith('\\'):
             for mountpoint in self._mount_points:
                 if mountpoint.fstype in TSK_FILESYSTEMS:
-                    extended_pattern = os.path.join(mountpoint.mountpoint, pattern)
+                    extended_pattern = os.path.join(mountpoint.mountpoint, pattern[1:])
                     filesystem = self._get_filesystem(extended_pattern)
                     filesystem.add_pattern(artifact, extended_pattern)
 

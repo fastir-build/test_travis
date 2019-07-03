@@ -27,6 +27,9 @@ class CommandExecutor(AbstractCollector):
             except CalledProcessError as e:
                 logger.warning(f"Command '{full_command_str}' for artifact '{command['artifact']}' returned error code '{e.returncode}'")
                 command_output = e.output
+            except FileNotFoundError:
+                logger.warning(f"Command '{command['cmd']}' for artifact '{command['artifact']}' could not be found")
+                command_output = b''
 
             output.add_collected_command(command['artifact'], full_command_str, command_output)
 
