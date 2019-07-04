@@ -27,6 +27,8 @@ def parse_human_size(size):
 
 
 def normalize_filepath(filepath):
+    print(filepath)
+    print(os.path.sep)
     # On Windows, make sure we remove the ':' behind the drive letter
     if filepath.index(os.path.sep) > 0:
         filepath = filepath.replace(':', '', 1)
