@@ -128,7 +128,7 @@ class Outputs:
             with open(os.path.join(self._dirpath, f'{self._hostname}-registry.json'), 'w') as out:
                 json.dump(self._registry, out, indent=2)
 
-        for handler in logger.handlers:
+        for handler in logger.handlers[:]:
             print(handler)
             handler.close()
             logger.removeHandler(handler)

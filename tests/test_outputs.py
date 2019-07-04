@@ -14,9 +14,7 @@ from fastir.common.output import parse_human_size, normalize_filepath, Outputs
 def output_file_content(dirpath, pattern):
     """Read the content of an output file with specified pattern."""
     outdir = glob.glob(os.path.join(dirpath, f'*-{platform.node()}'))[0]
-    print(outdir)
     filepath = glob.glob(os.path.join(outdir, pattern))[0]
-    print(filepath)
 
     with open(filepath, 'rb') as f:
         return f.read()
@@ -34,7 +32,7 @@ def test_parse_human_size():
 
 
 def test_normalize_filepath():
-    assert normalize_filepath(os.path.join('C:', os.path.sep, 'test')) == os.path.join('C', 'test')
+    assert normalize_filepath('C:/test'.replace('/', os.path.sep)) == os.path.join('C', 'test')
     assert normalize_filepath(os.path.join('', 'usr', 'share')) == os.path.join('', 'usr', 'share')
 
 
