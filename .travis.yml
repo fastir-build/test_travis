@@ -32,7 +32,7 @@ install:
 script:
 - python -m pytest --cov-report xml --cov fastir tests
 - pyinstaller fastir_artifacts.spec
-- python checkbuild.py
+- python -m pytest integration_tests
 after_success:
 - python -m zipfile -c FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist/fastir_artifacts
 before_deploy:
