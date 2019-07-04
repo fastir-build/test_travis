@@ -23,7 +23,8 @@ def resolved_paths(outputs):
 
     for call in outputs.add_collected_file.call_args_list:
         assert call[0][0] == 'TestArtifact'
-        paths.append(os.path.relpath(call[0][1].path, FS_ROOT))
+        paths.append(
+            os.path.relpath(call[0][1].path, FS_ROOT).replace(os.path.sep, '/'))
 
     return paths
 

@@ -27,7 +27,9 @@ def temp_dir():
 def outputs(temp_dir):
     with patch.object(Outputs, 'add_collected_command'):
         with patch.object(Outputs, 'add_collected_file'):
-            yield Outputs(temp_dir, maxsize=None)
+            outputs = Outputs(temp_dir, maxsize=None)
+            yield outputs
+            outputs.close()
 
 
 @pytest.fixture

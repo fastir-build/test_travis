@@ -14,9 +14,7 @@ from fastir.common.output import parse_human_size, normalize_filepath, Outputs
 def output_file_content(dirpath, pattern):
     """Read the content of an output file with specified pattern."""
     outdir = glob.glob(os.path.join(dirpath, f'*-{platform.node()}'))[0]
-    print(outdir)
     filepath = glob.glob(os.path.join(outdir, pattern))[0]
-    print(filepath)
 
     with open(filepath, 'rb') as f:
         return f.read()
@@ -34,7 +32,7 @@ def test_parse_human_size():
 
 
 def test_normalize_filepath():
-    assert normalize_filepath(os.path.join('C:', 'test')) == os.path.join('C', 'test')
+    assert normalize_filepath('C:/test'.replace('/', os.path.sep)) == os.path.join('C', 'test')
     assert normalize_filepath(os.path.join('', 'usr', 'share')) == os.path.join('', 'usr', 'share')
 
 
@@ -46,7 +44,7 @@ def test_logging(temp_dir):
 
     # Make sure the log message appears in the output directory
     logs = output_file_content(temp_dir, '*-logs.txt')
-    assert logs.endswith(b'test log message\n')
+    assert b'test log message' in logs
 
 
 def test_collect_file(temp_dir):
@@ -92,7 +90,7 @@ def test_collect_file_size_filter(temp_dir):
     assert zipped_files[0].endswith('test_file.txt')
 
     logs = output_file_content(temp_dir, '*-logs.txt')
-    assert logs.endswith(b"test_big_file.txt' because of its size\n")
+    assert b"test_big_file.txt' because of its size" in logs
 
 
 def test_collect_command(temp_dir):

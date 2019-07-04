@@ -28,7 +28,7 @@ def parse_human_size(size):
 
 def normalize_filepath(filepath):
     # On Windows, make sure we remove the ':' behind the drive letter
-    if filepath.index(os.sep) > 0:
+    if filepath.index(os.path.sep) > 0:
         filepath = filepath.replace(':', '', 1)
 
     return filepath.encode('utf-8', 'backslashreplace').decode('utf-8')
@@ -127,3 +127,8 @@ class Outputs:
         if self._registry:
             with open(os.path.join(self._dirpath, f'{self._hostname}-registry.json'), 'w') as out:
                 json.dump(self._registry, out, indent=2)
+
+        for handler in logger.handlers[:]:
+            print(handler)
+            handler.close()
+            logger.removeHandler(handler)

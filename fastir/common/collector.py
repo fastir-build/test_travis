@@ -51,6 +51,5 @@ class Collector:
         for collector in self._collectors:
             collector.collect(output)
 
-        output.close()
-
         logger.log(PROGRESS, "Finished collecting artifacts")
+        output.close()
