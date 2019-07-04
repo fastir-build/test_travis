@@ -34,7 +34,7 @@ def test_parse_human_size():
 
 
 def test_normalize_filepath():
-    assert normalize_filepath(os.path.join('C:', 'test')) == os.path.join('C', 'test')
+    assert normalize_filepath(os.path.join('C:', os.path.sep, 'test')) == os.path.join('C', 'test')
     assert normalize_filepath(os.path.join('', 'usr', 'share')) == os.path.join('', 'usr', 'share')
 
 

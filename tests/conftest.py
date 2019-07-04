@@ -20,7 +20,7 @@ def temp_dir():
 
     yield dirpath
 
-    # rmtree(dirpath)
+    rmtree(dirpath)
 
 
 @pytest.fixture
