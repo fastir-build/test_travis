@@ -46,7 +46,7 @@ def test_logging(temp_dir):
 
     # Make sure the log message appears in the output directory
     logs = output_file_content(temp_dir, '*-logs.txt')
-    assert logs.endswith(b'test log message\n')
+    assert b'test log message' in logs
 
 
 def test_collect_file(temp_dir):
@@ -92,7 +92,7 @@ def test_collect_file_size_filter(temp_dir):
     assert zipped_files[0].endswith('test_file.txt')
 
     logs = output_file_content(temp_dir, '*-logs.txt')
-    assert logs.endswith(b"test_big_file.txt' because of its size\n")
+    assert b"test_big_file.txt' because of its size" in logs
 
 
 def test_collect_command(temp_dir):

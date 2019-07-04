@@ -15,7 +15,7 @@ def resolved_paths(outputs):
     paths = []
 
     for call in outputs.add_collected_file.call_args_list:
-        paths.append(call[0][1].path)
+        paths.append(call[0][1].path.replace(os.path.sep, '/'))
 
     return paths
 
