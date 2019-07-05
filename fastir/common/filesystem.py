@@ -68,7 +68,10 @@ class FileSystem:
                 generator = component.get_generator(generator)
 
             for path in generator():
-                output.add_collected_file(pattern['artifact'], path)
+                try:
+                    output.add_collected_file(pattern['artifact'], path)
+                except Exception as e:
+                    logger.error(f"Error collecting file '{path.path}': {str(e)}")
 
 
 class TSKFileSystem(FileSystem):
