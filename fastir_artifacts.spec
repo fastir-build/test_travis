@@ -39,3 +39,10 @@ coll = COLLECT(exe,
                strip=False,
                upx=False,
                name='fastir_artifacts')
+
+if sys.platform == 'win32':
+    import shutil
+    # WOW64 redirection will pick up the right dll
+    if (os.path.exists(os.path.join(os.environ['SYSTEMROOT'], 'System32', 'msvcp140.dll')) and
+        not os.path.exists(os.path.join('dist', 'fastir_artifacts', 'msvcp140.dll'))):
+        shutil.copy(os.path.join(os.environ['SYSTEMROOT'], 'System32', 'msvcp140.dll'), os.path.join('dist', 'fastir_artifacts'))
