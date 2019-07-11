@@ -18,11 +18,20 @@ matrix:
     before_install:
     - python3 -m venv .venv
     - source .venv/bin/activate
-  - name: Python 3 on Windows
+  - name: Python 3 32bits on Windows
     os: windows
     language: shell
+    env: PKGSUFFIX=x32
     before_install:
     - choco install --forcex86 python3
+    - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+    - python -m pip install --upgrade pip wheel
+  - name: Python 3 64bits on Windows
+    os: windows
+    language: shell
+    env: PKGSUFFIX=x64
+    before_install:
+    - choco install python3
     - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
     - python -m pip install --upgrade pip wheel
 install:
@@ -34,7 +43,7 @@ script:
 - pyinstaller fastir_artifacts.spec
 - python -m pytest integration_tests
 after_success:
-- python -m zipfile -c FastIR-Artifacts-${TRAVIS_OS_NAME}.zip dist/fastir_artifacts
+- python -m zipfile -c FastIR-Artifacts-${TRAVIS_OS_NAME}${PKGSUFFIX:+-${PKGSUFFIX}}.zip dist/fastir_artifacts
 before_deploy:
 - git config --local user.name "fastir-build"
 - git config --local user.email "50839404+fastir-build@users.noreply.github.com"
