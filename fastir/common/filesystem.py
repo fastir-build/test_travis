@@ -141,6 +141,13 @@ class DFVFSFileSystem(FileSystem):
 
             return entries
 
+    def _follow_symlink(self, parent, path_object):
+        # TODO: attempt to follow symlinks with DFVFS
+        #
+        # As a temporary fix, downgrade all links to OSFileSystem so that
+        # they are still collected
+        return OSFileSystem('/').get_fullpath(path_object.path)
+
     def get_size(self, path_object):
         stream = path_object.obj.GetFileObject()
         stream.seek(0, os.SEEK_END)
@@ -175,8 +182,9 @@ class TSKFileSystem(DFVFSFileSystem):
             definitions.TYPE_INDICATOR_TSK, location='/', parent=self._os_path_spec)
 
     def get_fullpath(self, fullpath):
+        relative_path = '/' + self._relative_path(fullpath)
         path_spec = factory.Factory.NewPathSpec(
-            definitions.TYPE_INDICATOR_TSK, location=fullpath, parent=self._os_path_spec)
+            definitions.TYPE_INDICATOR_TSK, location=relative_path, parent=self._os_path_spec)
         file_entry = resolver.Resolver.OpenFileEntry(path_spec)
 
         return PathObject(self, os.path.basename(fullpath), fullpath, file_entry)
