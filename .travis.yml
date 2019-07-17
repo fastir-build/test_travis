@@ -1,9 +1,8 @@
 language: python
 env:
-  matrix:
-  - TZ=UTC
   global:
-    secure: nrWVD+UwbSkWiaSiQIqKlvRGqWZQ1Dbc8RUWOHBfkfAWEiQMEL4SyVvBUDVMqjqR53LeXLlAazP1DRW0BstM7lqI2+/HoW3AIKrD0Czp58ol3T4y7zA0Xt63ovZT7L2tZnkdod5N8WgGCSc3QKRGdYevj3xEdsPGrgbxU5x4mL93r122EjVX8G6bY5ygvBVw6HI9gO8eTiJD8X6VeDKLpdoICzRqzFTxm8bPNuLa2B5FG61TmyQeq7lrog/kniOqJ4NIqPG+dhZIuS8xEcgsYkd+7xkaT5gUXqaElFcY0eL60BJ/Hu9IEkiVcExdiElcGrdHb/rcqogaEg8OeS9GfrB9PAcZH2Ec046st7mlAMCifKCFp8cfI3w6euNak+cVdaeeLSCu3cvYTxoJ4+hcCpRPU8DS/negfadunE65nPU5G2jaTQ+zXeFueSNAv3vOT99v+5U9sCh4fSJ4WqxGx4DOTKPjy+HNoXYUblZttSG1TbK7wQMoTb0cTi4ThnjtR1KQdCNzByl3CmCKWZ+OkM5jU+dRBmwS0BeLuk+X+GHfeGnGNYqIi3lBGSZf7zfXgVh2qkZhlV3eb4mhnvcy6zDZOj0ZpetHO+sB0qc2kD1pzS8Y6j+/oRVDeHOWwp3YKUXuYVKiSKEWJwDFjpVNnepmvIsCd92c/8u2RIYjs1U=
+  - TZ=UTC
+  - secure: nrWVD+UwbSkWiaSiQIqKlvRGqWZQ1Dbc8RUWOHBfkfAWEiQMEL4SyVvBUDVMqjqR53LeXLlAazP1DRW0BstM7lqI2+/HoW3AIKrD0Czp58ol3T4y7zA0Xt63ovZT7L2tZnkdod5N8WgGCSc3QKRGdYevj3xEdsPGrgbxU5x4mL93r122EjVX8G6bY5ygvBVw6HI9gO8eTiJD8X6VeDKLpdoICzRqzFTxm8bPNuLa2B5FG61TmyQeq7lrog/kniOqJ4NIqPG+dhZIuS8xEcgsYkd+7xkaT5gUXqaElFcY0eL60BJ/Hu9IEkiVcExdiElcGrdHb/rcqogaEg8OeS9GfrB9PAcZH2Ec046st7mlAMCifKCFp8cfI3w6euNak+cVdaeeLSCu3cvYTxoJ4+hcCpRPU8DS/negfadunE65nPU5G2jaTQ+zXeFueSNAv3vOT99v+5U9sCh4fSJ4WqxGx4DOTKPjy+HNoXYUblZttSG1TbK7wQMoTb0cTi4ThnjtR1KQdCNzByl3CmCKWZ+OkM5jU+dRBmwS0BeLuk+X+GHfeGnGNYqIi3lBGSZf7zfXgVh2qkZhlV3eb4mhnvcy6zDZOj0ZpetHO+sB0qc2kD1pzS8Y6j+/oRVDeHOWwp3YKUXuYVKiSKEWJwDFjpVNnepmvIsCd92c/8u2RIYjs1U=
 matrix:
   include:
   - name: Python 3.7 on Xenial Linux
@@ -18,11 +17,11 @@ matrix:
     before_install:
     - python3 -m venv .venv
     - source .venv/bin/activate
-  - name: Python 3 on Windows
+  - name: Python 3 32bits on Windows
     os: windows
     language: shell
     before_install:
-    - choco install python3
+    - choco install --forcex86 python3
     - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
     - python -m pip install --upgrade pip wheel
 install:

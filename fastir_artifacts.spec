@@ -39,3 +39,22 @@ coll = COLLECT(exe,
                strip=False,
                upx=False,
                name='fastir_artifacts')
+
+if sys.platform == 'win32':
+    import glob
+    import shutil
+
+    # WOW64 redirection will pick up the right msvcp140.dll
+    if (os.path.exists(os.path.join(os.environ['SYSTEMROOT'], 'System32', 'msvcp140.dll')) and
+        not os.path.exists(os.path.join('dist', 'fastir_artifacts', 'msvcp140.dll'))):
+        shutil.copy(os.path.join(os.environ['SYSTEMROOT'], 'System32', 'msvcp140.dll'), os.path.join('dist', 'fastir_artifacts'))
+
+    # Copy Universal CRT
+    if sys.maxsize > 2 ** 32:
+        source = os.path.join(os.environ['PROGRAMFILES(X86)'], 'Windows Kits', '10', 'Redist', 'ucrt', 'DLLs', 'x64', '*.dll')
+    else:
+        source = os.path.join(os.environ['PROGRAMFILES(X86)'], 'Windows Kits', '10', 'Redist', 'ucrt', 'DLLs', 'x86', '*.dll')
+
+    for f in glob.glob(source):
+        if not os.path.exists(os.path.join('dist', 'fastir_artifacts', os.path.basename(f))):
+            shutil.copy(f, os.path.join('dist', 'fastir_artifacts'))
