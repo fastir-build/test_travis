@@ -5,3 +5,8 @@ PyYAML==5.1.1
 pytsk3==20190507
 PyInstaller==3.4
 psutil==5.6.3
+dfvfs==20190714
+dfdatetime==20190517
+dtfabric==20190120
+libfsapfs-python==20190510
+libsmdev-python==20190315

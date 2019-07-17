@@ -1,9 +1,12 @@
 import re
 import os
 
-import pytsk3
 import psutil
 import artifacts
+
+from dfvfs.path import factory
+from dfvfs.lib import definitions
+from dfvfs.resolver import resolver
 
 from fastir.common.logging import logger
 from fastir.common.collector import AbstractCollector
@@ -68,62 +71,42 @@ class FileSystem:
                 generator = component.get_generator(generator)
 
             for path in generator():
-                try:
+                if path.is_file():
                     output.add_collected_file(pattern['artifact'], path)
-                except Exception as e:
-                    logger.error(f"Error collecting file '{path.path}': {str(e)}")
 
 
-class TSKFileSystem(FileSystem):
-    def __init__(self, manager, device, path):
-        self._manager = manager
+class DFVFSFileSystem(FileSystem):
+    def __init__(self, path):
+        super().__init__()
+
         self._path = path
-        self._root = None
 
-        # Unix Device
-        if self._path.startswith('/'):
-            self._device = device
-        else:
-            # On Windows, we need a specific format '\\.\<DRIVE_LETTER>:'
-            self._device = r"\\.\{}:".format(device[0])
+        # Should be defined in subclasses
+        self._base_path_spec = None
 
         # Cache parsed entries for better performances
         self._entries_cache = {}
         self._entries_cache_last = []
-
-        super().__init__()
 
     def _relative_path(self, filepath):
         normalized_path = filepath.replace(os.path.sep, '/')
         return normalized_path[len(self._path):].lstrip('/')
 
     def _base_generator(self):
-        if not self._root:
-            img_info = pytsk3.Img_Info(self._device)
-            self._fs_info = pytsk3.FS_Info(img_info)
-            self._root = self._fs_info.open_dir('')
+        file_entry = resolver.Resolver.OpenFileEntry(self._base_path_spec)
 
-        yield PathObject(self, os.path.basename(self._path), self._path, self._root)
+        yield PathObject(self, os.path.basename(self._path), self._path, file_entry)
 
-    def is_allocated(self, tsk_entry):
-        return (int(tsk_entry.info.name.flags) & pytsk3.TSK_FS_NAME_FLAG_ALLOC != 0 and
-                int(tsk_entry.info.meta.flags) & pytsk3.TSK_FS_META_FLAG_ALLOC != 0)
+    def is_directory(self, path):
+        return path.obj.IsDirectory()
 
-    def is_directory(self, path_object):
-        return path_object.obj.info.meta.type in [pytsk3.TSK_FS_META_TYPE_DIR, pytsk3.TSK_FS_META_TYPE_VIRT_DIR]
+    def is_file(self, path):
+        return path.obj.IsFile()
 
-    def is_file(self, path_object):
-        return path_object.obj.info.meta.type == pytsk3.TSK_FS_META_TYPE_REG
-
-    def is_symlink(self, path_object):
-        return path_object.obj.info.meta.type == pytsk3.TSK_FS_META_TYPE_LNK
-
-    def _follow_symlink(self, parent, path_object):
-        # TODO: attempt to follow symlinks with TSK
-        #
-        # As a temporary fix, downgrade all links to OSFileSystem so that
-        # they are still collected
-        return OSFileSystem('/').get_fullpath(path_object.path)
+    def get_path(self, parent, name):
+        for path_object in self.list_directory(parent):
+            if os.path.normcase(name) == os.path.normcase(path_object.name):
+                return path_object
 
     def list_directory(self, path_object):
         if path_object.path in self._entries_cache:
@@ -135,32 +118,17 @@ class TSKFileSystem(FileSystem):
                 del self._entries_cache[first]
 
             entries = []
+
+            if not self.is_directory(path_object):
+                return
+
             directory = path_object.obj
-
-            if not isinstance(directory, pytsk3.Directory):
-                if not self.is_directory(path_object):
-                    return
-
-                directory = path_object.obj.as_directory()
-
-            for entry in directory:
-                if (
-                    not hasattr(entry, 'info') or
-                    not hasattr(entry.info, 'name') or
-                    not hasattr(entry.info.name, 'name') or
-                    entry.info.name.name in [b'.', b'..'] or
-                    not hasattr(entry.info, 'meta') or
-                    not hasattr(entry.info.meta, 'size') or
-                    not hasattr(entry.info.meta, 'type') or
-                    not self.is_allocated(entry)
-                ):
-                    continue
-
-                name = entry.info.name.name.decode('utf-8', errors='replace')
+            for entry in directory.sub_file_entries:
+                name = entry.name
                 filepath = os.path.join(path_object.path, name)
                 entry_path_object = PathObject(self, name, filepath, entry)
 
-                if entry.info.meta.type == pytsk3.TSK_FS_META_TYPE_LNK:
+                if entry.IsLink():
                     symlink_object = self._follow_symlink(path_object, entry_path_object)
 
                     if symlink_object:
@@ -173,82 +141,58 @@ class TSKFileSystem(FileSystem):
 
             return entries
 
-    def get_path(self, parent, name):
-        for path_object in self.list_directory(parent):
-            if os.path.normcase(name) == os.path.normcase(path_object.name):
-                return path_object
+    def get_size(self, path_object):
+        stream = path_object.obj.GetFileObject()
+        stream.seek(0, os.SEEK_END)
+        size = stream.tell()
+        stream.close()
 
-    def get_fullpath(self, filepath):
-        relative_path = self._relative_path(filepath)
-        path_object = next(self._base_generator())
-
-        for part in relative_path.split('/'):
-            path_object = self.get_path(path_object, part)
-
-        return path_object
+        return size
 
     def read_chunks(self, path_object):
-        size = path_object.obj.info.meta.size
-        offset = 0
+        stream = path_object.obj.GetFileObject()
 
-        while offset < size:
-            chunk_size = min(CHUNK_SIZE, size - offset)
-            chunk = path_object.obj.read_random(offset, chunk_size)
+        chunk = stream.read(CHUNK_SIZE)
+        if chunk:
+            yield chunk
 
-            if chunk:
-                offset += chunk_size
-                yield chunk
-            else:
-                break
-
-    def get_size(self, path_object):
-        return path_object.obj.info.meta.size
+        stream.close()
 
 
-class OSFileSystem(FileSystem):
-    def __init__(self, path):
-        self._path = path
+class TSKFileSystem(DFVFSFileSystem):
+    def __init__(self, path, device):
+        super().__init__(path)
 
-        super().__init__()
+        # Unix Device
+        if path.startswith('/'):
+            self._device = device
+        else:
+            # On Windows, we need a specific format '\\.\<DRIVE_LETTER>:'
+            self._device = r"\\.\{}:".format(device[0])
 
-    def _relative_path(self, filepath):
-        normalized_path = filepath.replace(os.path.sep, '/')
-        return normalized_path[len(self._path):].lstrip('/')
-
-    def _base_generator(self):
-        yield PathObject(self, os.path.basename(self._path), self._path)
-
-    def is_directory(self, path):
-        return os.path.isdir(path.path)
-
-    def is_file(self, path):
-        return os.path.isfile(path.path)
-
-    def is_symlink(self, path):
-        # When using syscalls, symlinks are automatically followed
-        return False
-
-    def list_directory(self, path):
-        for name in os.listdir(path.path):
-            yield PathObject(self, name, os.path.join(path.path, name))
-
-    def get_path(self, parent, name):
-        return PathObject(self, name, os.path.join(parent.path, name))
+        self._os_path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_OS, location=self._device)
+        self._base_path_spec = factory.Factory.NewPathSpec(
+            definitions.TYPE_INDICATOR_TSK, location='/', parent=self._os_path_spec)
 
     def get_fullpath(self, fullpath):
-        return PathObject(self, os.path.basename(fullpath), fullpath)
+        path_spec = factory.Factory.NewPathSpec(
+            definitions.TYPE_INDICATOR_TSK, location=fullpath, parent=self._os_path_spec)
+        file_entry = resolver.Resolver.OpenFileEntry(path_spec)
 
-    def read_chunks(self, path_object):
-        with open(path_object.path, 'rb') as f:
-            chunk = f.read(CHUNK_SIZE)
+        return PathObject(self, os.path.basename(fullpath), fullpath, file_entry)
 
-            if chunk:
-                yield chunk
 
-    def get_size(self, path_object):
-        stats = os.lstat(path_object.path)
+class OSFileSystem(DFVFSFileSystem):
+    def __init__(self, path):
+        super().__init__(path)
 
-        return stats.st_size
+        self._base_path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_OS, location=path)
+
+    def get_fullpath(self, fullpath):
+        path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_OS, location=fullpath)
+        file_entry = resolver.Resolver.OpenFileEntry(path_spec)
+
+        return PathObject(self, os.path.basename(fullpath), fullpath, file_entry)
 
 
 class FileSystemManager(AbstractCollector):
@@ -278,16 +222,11 @@ class FileSystemManager(AbstractCollector):
         # Fetch or create the matching filesystem
         if mountpoint.mountpoint not in self._filesystems:
             if mountpoint.fstype in TSK_FILESYSTEMS:
-                self._filesystems[mountpoint.mountpoint] = TSKFileSystem(
-                    self, mountpoint.device, mountpoint.mountpoint)
+                self._filesystems[mountpoint.mountpoint] = TSKFileSystem(mountpoint.mountpoint, mountpoint.device)
             else:
                 self._filesystems[mountpoint.mountpoint] = OSFileSystem(mountpoint.mountpoint)
 
         return self._filesystems[mountpoint.mountpoint]
-
-    def get_path_object(self, filepath):
-        filesystem = self._get_filesystem(filepath)
-        return filesystem.get_fullpath(filepath)
 
     def add_pattern(self, artifact, pattern):
         pattern = os.path.normpath(pattern)
@@ -320,3 +259,7 @@ class FileSystemManager(AbstractCollector):
                     self.add_pattern(artifact_definition.name, sp)
 
         return supported
+
+    def get_path_object(self, filepath):
+        filesystem = self._get_filesystem(filepath)
+        return filesystem.get_fullpath(filepath)
