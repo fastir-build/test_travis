@@ -2,12 +2,23 @@
 
 import os.path
 import sys
+import glob
+import importlib
+
+
+datas = []
+
+dfvfs_root = os.path.dirname(importlib.import_module('dfvfs').__file__)
+for filepath in glob.glob(os.path.join(dfvfs_root, 'lib', '*.yaml')):
+    datas.append((filepath, 'dfvfs/lib'))
+
+datas.append((os.path.join(sys.prefix, 'share', 'artifacts'), os.path.join('share', 'artifacts')))
 
 
 a = Analysis(['fastir_artifacts.py'],
              pathex=['.'],
              binaries=[],
-             datas=[(os.path.join(sys.prefix, 'share', 'artifacts'), os.path.join('share', 'artifacts'))],
+             datas=datas,
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
