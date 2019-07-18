@@ -10,4 +10,4 @@ dfdatetime==20190517
 dtfabric==20190120
 libfsapfs-python==20190510
 libsmdev-python==20190315
-pycrypto==2.6.1
+pycryptodome==3.8.2
