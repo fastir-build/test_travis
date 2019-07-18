@@ -17,6 +17,7 @@ PATH_RECURSION_REGEX = re.compile(r"\*\*(?P<max_depth>\d*)")
 PATH_GLOB_REGEX = re.compile(r"\*|\?|\[.+\]")
 
 TSK_FILESYSTEMS = ['NTFS', 'ext3', 'ext4']
+APFS_FILESYSTEMS = ['apfs']
 
 
 class FileSystem:
@@ -166,7 +167,10 @@ class DFVFSFileSystem(FileSystem):
         stream.close()
 
 
-class TSKFileSystem(DFVFSFileSystem):
+class DFVFSParsedFileSystem(DFVFSFileSystem):
+    # Should be defined by subclasses
+    fs_type = None
+
     def __init__(self, path, device):
         super().__init__(path)
 
@@ -178,16 +182,22 @@ class TSKFileSystem(DFVFSFileSystem):
             self._device = r"\\.\{}:".format(device[0])
 
         self._os_path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_OS, location=self._device)
-        self._base_path_spec = factory.Factory.NewPathSpec(
-            definitions.TYPE_INDICATOR_TSK, location='/', parent=self._os_path_spec)
+        self._base_path_spec = factory.Factory.NewPathSpec(self.fs_type, location='/', parent=self._os_path_spec)
 
     def get_fullpath(self, fullpath):
         relative_path = '/' + self._relative_path(fullpath)
-        path_spec = factory.Factory.NewPathSpec(
-            definitions.TYPE_INDICATOR_TSK, location=relative_path, parent=self._os_path_spec)
+        path_spec = factory.Factory.NewPathSpec(self.fs_type, location=relative_path, parent=self._os_path_spec)
         file_entry = resolver.Resolver.OpenFileEntry(path_spec)
 
         return PathObject(self, os.path.basename(fullpath), fullpath, file_entry)
+
+
+class TSKFileSystem(DFVFSParsedFileSystem):
+    fs_type = definitions.TYPE_INDICATOR_TSK
+
+
+class APFSFileSystem(DFVFSParsedFileSystem):
+    fs_type = definitions.TYPE_INDICATOR_APFS
 
 
 class OSFileSystem(DFVFSFileSystem):
@@ -235,6 +245,8 @@ class FileSystemManager(AbstractCollector):
         if mountpoint.mountpoint not in self._filesystems:
             if mountpoint.fstype in TSK_FILESYSTEMS:
                 self._filesystems[mountpoint.mountpoint] = TSKFileSystem(mountpoint.mountpoint, mountpoint.device)
+            elif mountpoint.fstype in APFS_FILESYSTEMS:
+                self._filesystems[mountpoint.mountpoint] = APFSFileSystem(mountpoint.mountpoint, mountpoint.device)
             else:
                 self._filesystems[mountpoint.mountpoint] = OSFileSystem(mountpoint.mountpoint)
 
