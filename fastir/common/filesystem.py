@@ -202,6 +202,10 @@ class OSFileSystem(DFVFSFileSystem):
 
         return PathObject(self, os.path.basename(fullpath), fullpath, file_entry)
 
+    def is_file(self, path):
+        """Symlinks are automatically resolved by OS"""
+        return path.obj.IsFile() or path.obj.IsLink()
+
 
 class FileSystemManager(AbstractCollector):
     def __init__(self):

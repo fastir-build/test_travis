@@ -129,6 +129,5 @@ class Outputs:
                 json.dump(self._registry, out, indent=2)
 
         for handler in logger.handlers[:]:
-            print(handler)
             handler.close()
             logger.removeHandler(handler)
