@@ -1,6 +1,5 @@
 import re
 import os
-from posixpath import join as pathjoin
 
 import psutil
 import artifacts
@@ -126,7 +125,7 @@ class DFVFSFileSystem(FileSystem):
             directory = path_object.obj
             for entry in directory.sub_file_entries:
                 name = entry.name
-                filepath = pathjoin(path_object.path, name)
+                filepath = os.path.join(path_object.path, name)
                 entry_path_object = PathObject(self, name, filepath, entry)
 
                 if entry.IsLink():
@@ -248,7 +247,7 @@ class FileSystemManager(AbstractCollector):
         if pattern.startswith('\\'):
             for mountpoint in self._mount_points:
                 if mountpoint.fstype in TSK_FILESYSTEMS:
-                    extended_pattern = pathjoin(mountpoint.mountpoint, pattern[1:])
+                    extended_pattern = os.path.join(mountpoint.mountpoint, pattern[1:])
                     filesystem = self._get_filesystem(extended_pattern)
                     filesystem.add_pattern(artifact, extended_pattern)
 
