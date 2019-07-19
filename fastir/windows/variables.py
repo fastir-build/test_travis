@@ -23,8 +23,29 @@ def reg(hive, key, value, alternative_value=None):
 
 class WindowsHostVariables(HostVariables):
 
-    def _get_users(self):
-        return wmi_query('SELECT Name, SID FROM Win32_Account WHERE SidType = 1')
+    def _get_local_users(self):
+        return wmi_query('SELECT Name, SID FROM Win32_Account WHERE SidType = 1 AND LocalAccount = True')
+
+    def _get_extra_sids(self):
+        sids = set()
+
+        k1 = winreg.OpenKey(winreg.HKEY_USERS)
+
+        i = 0
+        while 1:
+            try:
+                sid = winreg.EnumKey(k1, i)
+
+                if '_Classes' not in sid and sid != '.DEFAULT':
+                    sids.add(sid)
+
+                i += 1
+            except WindowsError:
+                break
+
+        winreg.CloseKey(k1)
+
+        return sids
 
     def _get_user_profiles(self):
         profiles = set()
@@ -115,6 +136,9 @@ class WindowsHostVariables(HostVariables):
         self.add_variable('%%users.homedir%%', user_profiles)
         self.add_variable('%%users.userprofile%%', user_profiles)
 
-        users = self._get_users()
+        users = self._get_local_users()
+        extra_sids = self._get_extra_sids()
+        print(users)
+        print(extra_sids)
         self.add_variable('%%users.username%%', set([user['Name'] for user in users]))
-        self.add_variable('%%users.sid%%', set([user['SID'] for user in users]))
+        self.add_variable('%%users.sid%%', set([user['SID'] for user in users] + [sid for sid in extra_sids]))
