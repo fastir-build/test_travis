@@ -29,7 +29,7 @@ class WindowsHostVariables(HostVariables):
     def _get_extra_sids(self):
         sids = set()
 
-        k1 = winreg.OpenKey(winreg.HKEY_USERS)
+        k1 = winreg.HKEY_USERS
 
         i = 0
         while 1:
@@ -42,8 +42,6 @@ class WindowsHostVariables(HostVariables):
                 i += 1
             except WindowsError:
                 break
-
-        winreg.CloseKey(k1)
 
         return sids
 
