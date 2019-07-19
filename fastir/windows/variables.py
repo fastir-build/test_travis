@@ -136,7 +136,5 @@ class WindowsHostVariables(HostVariables):
 
         users = self._get_local_users()
         extra_sids = self._get_extra_sids()
-        print(users)
-        print(extra_sids)
         self.add_variable('%%users.username%%', set([user['Name'] for user in users]))
         self.add_variable('%%users.sid%%', set([user['SID'] for user in users] + [sid for sid in extra_sids]))
