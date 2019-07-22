@@ -8,7 +8,7 @@ from fastir.common.filesystem import TSKFileSystem
 @pytest.fixture
 def fs_test():
     return TSKFileSystem(
-        '/', os.path.join(os.path.dirname(__file__), 'data', 'image.raw'))
+        None, os.path.join(os.path.dirname(__file__), 'data', 'image.raw'), '/')
 
 
 def resolved_paths(outputs):
@@ -30,6 +30,11 @@ def test_all_files(fs_test, outputs):
         '/a_directory/a_file',
         '/passwords.txt',
     ])
+
+
+def test_is_symlink(fs_test):
+    path_object = fs_test.get_fullpath('/passwords.txt')
+    assert path_object.is_symlink() is False
 
 
 def test_several_patterns(fs_test, outputs):

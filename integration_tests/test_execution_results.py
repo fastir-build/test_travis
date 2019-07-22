@@ -151,6 +151,7 @@ def test_command_iptables(command_results):
 
 
 @pytest.mark.linux
+@pytest.mark.darwin
 def test_file_passwd(files_results_names, files_results):
     assert '/etc/passwd' in files_results_names
     with files_results.open('/etc/passwd') as f:
@@ -174,12 +175,6 @@ def test_command_kexts(command_results):
     for command, output in command_results['MacOSLoadedKexts'].items():
         assert 'kextstat' in command
         assert 'Name' in output
-
-@pytest.mark.darwin
-def test_file_private_passwd(files_results_names, files_results):
-    assert '/private/etc/passwd' in files_results_names
-    with files_results.open('/private/etc/passwd') as f:
-        assert b'root' in f.read()
 
 
 #####################

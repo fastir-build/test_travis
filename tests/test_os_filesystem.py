@@ -103,3 +103,8 @@ def test_path_resolution_recursive_star_root(fs_test, outputs):
     # Should only go to l2 because 3 is the default depth
     assert set(resolved_paths(outputs)) == set([
         'root.txt', 'root2.txt', 'test.txt', 'l1/l1.txt', 'l1/l2/l2.txt'])
+
+
+def test_is_symlink(fs_test):
+    path_object = fs_test.get_fullpath(fp('root.txt'))
+    assert path_object.is_symlink() is False
