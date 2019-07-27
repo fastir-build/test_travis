@@ -93,7 +93,7 @@ def main(arguments):
         locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
     except locale.Error:
         pass
-    output = Outputs(arguments.output, arguments.maxsize)
+    output = Outputs(arguments.output, arguments.maxsize, arguments.sha256)
 
     logger.log(PROGRESS, "Loading artifacts ...")
 
@@ -128,5 +128,6 @@ if __name__ == "__main__":
         action='store_true')
     parser.add_argument('-m', '--maxsize', help='Do not collect file with size > n')
     parser.add_argument('-o', '--output', help='Directory where the results are created', default='.')
+    parser.add_argument('-s', '--sha256', help='Compute SHA-256 of collected files', action='store_true')
 
     main(parser.parse_args())

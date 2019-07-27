@@ -1,4 +1,5 @@
 import os
+import hashlib
 import json
 import logging
 import zipfile
@@ -35,11 +36,12 @@ def normalize_filepath(filepath):
 
 
 class Outputs:
-    def __init__(self, dirpath, maxsize):
+    def __init__(self, dirpath, maxsize, sha256):
         self._dirpath = dirpath
 
         self._zip = None
         self._maxsize = parse_human_size(maxsize)
+        self._sha256 = sha256
 
         self._commands = defaultdict(dict)
         self._wmi = defaultdict(dict)
@@ -90,10 +92,16 @@ class Outputs:
             zinfo.compress_type = zipfile.ZIP_DEFLATED
 
             # Read/write by chunks to reduce memory footprint
+            if self._sha256:
+                h = hashlib.sha256()
             with self._zip._lock:
                 with self._zip.open(zinfo, mode='w', force_zip64=True) as dest:
                     for chunk in path_object.read_chunks():
                         dest.write(chunk)
+                        if self._sha256:
+                            h.update(chunk)
+            if self._sha256:
+                logger.info(f"File '{path_object.path}' has SHA-256 '{h.hexdigest()}'")
         else:
             logger.warning(f"Ignoring file '{path_object.path}' because of its size")
 

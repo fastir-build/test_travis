@@ -38,7 +38,7 @@ def test_normalize_filepath():
 
 def test_logging(temp_dir):
     # Create an Outputs instance and log a message
-    output = Outputs(temp_dir, None)
+    output = Outputs(temp_dir, None, False)
     logger.info('test log message')
     output.close()
 
@@ -53,7 +53,7 @@ def test_collect_file(temp_dir):
     with open(test_file, 'w') as f:
         f.write('test content')
 
-    output = Outputs(temp_dir, None)
+    output = Outputs(temp_dir, None, False)
     output.add_collected_file('TestArtifact', OSFileSystem('/').get_fullpath(test_file))
     output.close()
 
@@ -77,7 +77,7 @@ def test_collect_file_size_filter(temp_dir):
     with open(test_big_file, 'w') as f:
         f.write('some bigger content')
 
-    output = Outputs(temp_dir, '10')  # Set maximum size to 10 bytes
+    output = Outputs(temp_dir, '10', False)  # Set maximum size to 10 bytes
     output.add_collected_file('TestArtifact', OSFileSystem('/').get_fullpath(test_file))
     output.add_collected_file('TestArtifact', OSFileSystem('/').get_fullpath(test_big_file))
     output.close()
@@ -94,7 +94,7 @@ def test_collect_file_size_filter(temp_dir):
 
 
 def test_collect_command(temp_dir):
-    output = Outputs(temp_dir, None)
+    output = Outputs(temp_dir, None, False)
     output.add_collected_command('TestArtifact', 'command', b'output')
     output.close()
 
@@ -107,7 +107,7 @@ def test_collect_command(temp_dir):
 
 
 def test_collect_wmi(temp_dir):
-    output = Outputs(temp_dir, None)
+    output = Outputs(temp_dir, None, False)
     output.add_collected_wmi('TestArtifact', 'query', 'output')
     output.close()
 
@@ -120,7 +120,7 @@ def test_collect_wmi(temp_dir):
 
 
 def test_collect_registry(temp_dir):
-    output = Outputs(temp_dir, None)
+    output = Outputs(temp_dir, None, False)
     output.add_collected_registry_value('TestArtifact', 'key', 'name', 'value', 'type')
     output.close()
 
