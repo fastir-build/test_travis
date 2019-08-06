@@ -88,20 +88,22 @@ class Outputs:
         if not self._maxsize or path_object.get_size() <= self._maxsize:
             # Write file content to zipfile
             filename = normalize_filepath(path_object.path)
-            zinfo = zipfile.ZipInfo(filename=filename)
-            zinfo.compress_type = zipfile.ZIP_DEFLATED
 
-            # Read/write by chunks to reduce memory footprint
-            if self._sha256:
-                h = hashlib.sha256()
-            with self._zip._lock:
-                with self._zip.open(zinfo, mode='w', force_zip64=True) as dest:
-                    for chunk in path_object.read_chunks():
-                        dest.write(chunk)
-                        if self._sha256:
-                            h.update(chunk)
-            if self._sha256:
-                logger.info(f"File '{path_object.path}' has SHA-256 '{h.hexdigest()}'")
+            if filename not in self._zip.namelist():
+                zinfo = zipfile.ZipInfo(filename=filename)
+                zinfo.compress_type = zipfile.ZIP_DEFLATED
+
+                # Read/write by chunks to reduce memory footprint
+                if self._sha256:
+                    h = hashlib.sha256()
+                with self._zip._lock:
+                    with self._zip.open(zinfo, mode='w', force_zip64=True) as dest:
+                        for chunk in path_object.read_chunks():
+                            dest.write(chunk)
+                            if self._sha256:
+                                h.update(chunk)
+                if self._sha256:
+                    logger.info(f"File '{path_object.path}' has SHA-256 '{h.hexdigest()}'")
         else:
             logger.warning(f"Ignoring file '{path_object.path}' because of its size")
 

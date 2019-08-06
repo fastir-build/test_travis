@@ -229,8 +229,11 @@ class OSFileSystem(FileSystem):
         return False
 
     def list_directory(self, path):
-        for name in os.listdir(path.path):
-            yield PathObject(self, name, os.path.join(path.path, name))
+        try:
+            for name in os.listdir(path.path):
+                yield PathObject(self, name, os.path.join(path.path, name))
+        except Exception as e:
+            logger.error(f"Error analyzing directory '{path.path}': {str(e)}")
 
     def get_path(self, parent, name):
         return PathObject(self, name, os.path.join(parent.path, name))
