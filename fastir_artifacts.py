@@ -16,7 +16,8 @@ from fastir.common.helpers import get_operating_system
 # that could have a big impact on performance.
 BLACKLIST = [
     'WMILoginUsers',
-    'WMIUsers'
+    'WMIUsers',
+    'WMIVolumeShadowCopies'
 ]
 
 REGISTRY_TYPES = [
