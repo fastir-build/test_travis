@@ -60,5 +60,5 @@ deploy:
   overwrite: true
   on:
     all_branches: true
-    condition: $TRAVIS_BRANCH != "master"
+    condition: branch != "master"
     repo: fastir-build/test_travis
