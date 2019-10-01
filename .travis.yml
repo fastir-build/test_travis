@@ -62,4 +62,4 @@ deploy:
   on:
     all_branches: true
     repo: fastir-build/test_travis
-    condition: "$TRAVIS_BRANCH != master"
+    condition: "branch != master"
