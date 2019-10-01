@@ -50,16 +50,16 @@ deploy:
   overwrite: true
   on:
     repo: fastir-build/test_travis
-- provider: releases
-  api_key:
-    secure: gsWwZgehCEQiH30TYY4PcIR4biXoljJvJ6cWwAbDF3urqrUhR4bEqk/pUebt9EiQqAuN9irsjVKydll2SQKX5kKXFjr9/xVuwHPP1Im+zkRo6CGwMUzzVEy46HXRY2MZ7KmL9rfhwEhFddlm6mU1kdkNumpzwDdktKBSlxRPZuKZFhTczL63z47uhKFqmXSl9Vb2IHDT+TWs4yxRFB7p7jGqdy8fsRXvDGNH/9CVyZoF7+BRDbEGEx1atTHvdEAiXHq32G6Nlc5CQkIVFX7r1PrBccrlo3c7b/q6cUeAvLWfpF8P3AqzQamjX1pxCP70MzHs2cflto1FgRjGrWAGA28lrI67lFthquUxpvpVcPdmmU9K3Cx8uL+fNRJSGwUhOJpy7sa6WUZHZV84fh3zEzaPyzP0HMz4JVoYeJ4S+K0Kw3YmZ/r91Wry0herdJEbLCc9CToM32bY+oc3hxrBZrcAiMlPJrKyZs6IDyEu0FkkGuyf1dQl0wmiLd6DIN+RsxJCcroGbsrAskOvtnK/z8bpdevBaFumXZlampfw8CfIWmCikY9WoeTdOC0fnawctjOm4uZ0IAu0Z+61QyayFJicQMbG8g/pKjbp6FzQqKtBrYqwGydMjs1jnVgMiiIvFu+ItKAGbelubCTP2xolN4T9kHrm72//0Go7GUlo73w=
-  file_glob: true
-  file: FastIR-Artifacts-*.zip
-  skip_cleanup: true
-  draft: true
-  overwrite: true
-  name: "Draft ${TRAVIS_BRANCH}"
-  on:
-    all_branches: true
-    repo: fastir-build/test_travis
-    condition: "branch != master"
+#- provider: releases
+#  api_key:
+#    secure: gsWwZgehCEQiH30TYY4PcIR4biXoljJvJ6cWwAbDF3urqrUhR4bEqk/pUebt9EiQqAuN9irsjVKydll2SQKX5kKXFjr9/xVuwHPP1Im+zkRo6CGwMUzzVEy46HXRY2MZ7KmL9rfhwEhFddlm6mU1kdkNumpzwDdktKBSlxRPZuKZFhTczL63z47uhKFqmXSl9Vb2IHDT+TWs4yxRFB7p7jGqdy8fsRXvDGNH/9CVyZoF7+BRDbEGEx1atTHvdEAiXHq32G6Nlc5CQkIVFX7r1PrBccrlo3c7b/q6cUeAvLWfpF8P3AqzQamjX1pxCP70MzHs2cflto1FgRjGrWAGA28lrI67lFthquUxpvpVcPdmmU9K3Cx8uL+fNRJSGwUhOJpy7sa6WUZHZV84fh3zEzaPyzP0HMz4JVoYeJ4S+K0Kw3YmZ/r91Wry0herdJEbLCc9CToM32bY+oc3hxrBZrcAiMlPJrKyZs6IDyEu0FkkGuyf1dQl0wmiLd6DIN+RsxJCcroGbsrAskOvtnK/z8bpdevBaFumXZlampfw8CfIWmCikY9WoeTdOC0fnawctjOm4uZ0IAu0Z+61QyayFJicQMbG8g/pKjbp6FzQqKtBrYqwGydMjs1jnVgMiiIvFu+ItKAGbelubCTP2xolN4T9kHrm72//0Go7GUlo73w=
+#  file_glob: true
+#  file: FastIR-Artifacts-*.zip
+#  skip_cleanup: true
+#  draft: true
+#  overwrite: true
+#  name: "Draft ${TRAVIS_BRANCH}"
+#  on:
+#    all_branches: true
+#    repo: fastir-build/test_travis
+#    condition: "branch != master"
