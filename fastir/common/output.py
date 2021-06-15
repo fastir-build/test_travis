@@ -62,7 +62,7 @@ class Outputs:
 
         # Create the directory and set an environment variable that may be used in COMMAND artifacts
         os.makedirs(self._dirpath)
-        os.environ['FAOUTPUTDIR'] = self._dirpath
+        os.environ['FAOUTPUTDIR'] = os.path.abspath(self._dirpath)
 
         self._setup_logging()
 
